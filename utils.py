@@ -6,6 +6,8 @@ from scipy import stats
 
 from torchvision.transforms import Resize
 
+import cv2
+
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
@@ -34,23 +36,26 @@ def load_pickle(filename):
 
 
 def stitch_plots(filepath1, filepath2, filepath_result, title1=None, title2=None):
-    plt.figure(figsize=(30, 20))
 
-    f, axarr = plt.subplots(1, 2)
+    f, axarr = plt.subplots(1, 2, figsize=(30, 20))
 
     # Show the image on the first subplot
-    axarr[0].imshow(mpimg.imread(filepath1))
+    # axarr[0].imshow(mpimg.imread(filepath1))
+    img1 = cv2.imread(filepath1)[:, :, ::-1]
+    axarr[0].imshow(img1)
     axarr[0].axis("off")
     if title1:
         axarr[0].set_title(title1)
 
     # Show the image on the second subplot
-    axarr[1].imshow(mpimg.imread(filepath2))
+    # axarr[1].imshow(mpimg.imread(filepath2))
+    img2 = cv2.imread(filepath2)[:, :, ::-1]
+    axarr[1].imshow(img2)
     axarr[1].axis("off")
     if title2:
-        axarr[2].set_title(title2)
+        axarr[1].set_title(title2)
 
-    plt.savefig(filepath_result, bbox_inches='tight')
+    plt.savefig(filepath_result, bbox_inches='tight', dpi=300, facecolor='white')
     plt.close()
 
 
@@ -66,16 +71,13 @@ def print_image(image, path=None, title=None):
 
     """Plot and save an image."""
 
-    fig, ax = plt.subplots()
-    ax.imshow(image)
-
-    plt.rcParams['figure.facecolor'] = 'grey'
+    plt.imshow(image.astype(np.uint8))
 
     if title:
         plt.title(title, fontsize=20)
     plt.axis("off")
     if path:
-        plt.savefig(path, bbox_inches='tight')
+        plt.savefig(path, bbox_inches='tight', facecolor='white')
     else:
         plt.show()
     plt.close()
@@ -83,11 +85,14 @@ def print_image(image, path=None, title=None):
 
 
 def imshow(img, img_title=None, fontsize=10):
+
     plt.rcParams['figure.facecolor'] = 'white'
-    plt.imshow(img)
+    plt.imshow(img.astype(np.uint8))
+
     if img_title:
         plt.title(img_title, fontsize=fontsize)
     plt.axis("off")
+    plt.show()
 
 
 

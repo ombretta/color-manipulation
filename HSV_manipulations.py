@@ -27,7 +27,6 @@ def get_HSV_RGB(img_file, scale_factor=1.0):
         The image in RGB color space.
     """
     bgr_img = cv2.imread(img_file)
-    print(img_file)
     rgb_img = bgr_img[:, :, ::-1]
 
     downscaled_bgr_img = cv2.resize(bgr_img, (0, 0), fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_AREA)
@@ -39,6 +38,7 @@ def get_HSV_RGB(img_file, scale_factor=1.0):
 def plot_colorwheel(x, y, colors, path, figsize=(10, 10)):
     """Plots the color wheel."""
     plt.figure(figsize=figsize)
+
     plt.scatter(x, y, c=colors / 255)
 
     # Draw circle boundary
@@ -53,7 +53,7 @@ def plot_colorwheel(x, y, colors, path, figsize=(10, 10)):
     plt.yticks(size=20)
     plt.axis("off")
 
-    plt.savefig(path, bbox_inches='tight', facecolor='white')
+    plt.savefig(path, bbox_inches='tight')
     plt.close()
 
 
@@ -64,19 +64,19 @@ def plot_color_wheel(hsv, rgb, colors, examples_dir, img_file):
     x_coordinates = r * np.cos(theta)
     y_coordinates = r * np.sin(theta)
 
-    if examples_dir and not os.path.exists(examples_dir + img_file.replace(".jpg", ".png")):
-        print_image(rgb, examples_dir + "RGB.png")
-        plot_colorwheel(x_coordinates, y_coordinates, colors, path=examples_dir + "colorwheel.png")
-        stitch_plots(examples_dir + "RGB.png", examples_dir + "colorwheel.png",
-                     examples_dir + img_file.replace(".jpg", ".png"))
-        os.remove(examples_dir + "RGB.png")
-        os.remove(examples_dir + "colorwheel.png")
+    if examples_dir and not os.path.exists(examples_dir + img_file.replace(".jpg", ".jpg")):
+        print_image(rgb, examples_dir + "RGB.jpg")
+        plot_colorwheel(x_coordinates, y_coordinates, colors, path=examples_dir + "colorwheel.jpg")
+        stitch_plots(examples_dir + "RGB.jpg", examples_dir + "colorwheel.jpg",
+                     examples_dir + img_file.replace(".jpg", ".jpg"))
+        os.remove(examples_dir + "RGB.jpg")
+        os.remove(examples_dir + "colorwheel.jpg")
 
 
 def print_new_image(HSV_new, downsampling_factor, file_dir, file_name):
     """Converts HSV image to RGB and generates a color wheel visualization."""
     rgb_image = cv2.cvtColor(HSV_new, cv2.COLOR_HSV2RGB)
-    colors = cv2.cvtColor(HSV_new, cv2.COLOR_HSV2BGR).reshape(-1, 3)[::downsampling_factor][:, ::-1]
+    colors = rgb_image.reshape(-1, 3)[::downsampling_factor]
     HSV = HSV_new.transpose(2, 0, 1).reshape((3, -1)).transpose(1, 0)[::downsampling_factor]
     plot_color_wheel(HSV, rgb_image, colors, file_dir, file_name)
 
@@ -127,8 +127,10 @@ def change_saturation(HSV, delta, downsampling_factor, img_file, result_dir):
 
     saturation = HSV[:, :, 1].astype('float16')
     HSV[:, :, 1] = np.maximum(0, np.minimum(saturation + delta, 255))
-    file_name = img_file.replace(".jpg", f"_{delta}saturation.jpg")
-    print_new_image(HSV, downsampling_factor, result_dir, file_name)
+    img_file = img_file.replace(".jpg", f"_{delta}saturation.jpg")
+    cv2.imwrite(result_dir+img_file, cv2.cvtColor(HSV, cv2.COLOR_HSV2BGR))
+    img_file = img_file.replace(".jpg", "_colorwheel.jpg")
+    print_new_image(HSV, downsampling_factor, result_dir, img_file)
 
 
 def change_brightness(HSV, delta, downsampling_factor, img_file, result_dir):
@@ -138,8 +140,10 @@ def change_brightness(HSV, delta, downsampling_factor, img_file, result_dir):
 
     brightness = HSV[:, :, 2].astype('float16')
     HSV[:, :, 2] = np.maximum(0, np.minimum(brightness + delta, 255))
-    file_name = img_file.replace(".jpg", f"_{delta}brightness.jpg")
-    print_new_image(HSV, downsampling_factor, result_dir, file_name)
+    img_file = img_file.replace(".jpg", f"_{delta}brightness.jpg")
+    cv2.imwrite(result_dir+img_file, cv2.cvtColor(HSV, cv2.COLOR_HSV2BGR))
+    img_file = img_file.replace(".jpg", "_colorwheel.jpg")
+    print_new_image(HSV, downsampling_factor, result_dir, img_file)
     return HSV
 
 

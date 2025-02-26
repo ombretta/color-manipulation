@@ -117,7 +117,7 @@ def map_image_to_palette(image_path, savedir_image, n=6):
     # Save the new image
     image_name = image_path.split("/")[-1]
     os.makedirs(savedir_image, exist_ok=True)
-    cv2.imwrite(savedir_image + image_name + f"_simplified_{n}d.jpg", new_image[:, :, ::-1])
+    cv2.imwrite(savedir_image + image_name.replace(".jpg", f"_simplified_{n}d.jpg"), new_image[:, :, ::-1])
 
 
 def image_recoloring(image_path, color_path, savedir_image, n=6):
@@ -143,7 +143,7 @@ def image_recoloring(image_path, color_path, savedir_image, n=6):
     # Save the new image
     image_name = image_path.split("/")[-1]
     os.makedirs(savedir_image, exist_ok=True)
-    cv2.imwrite(savedir_image + image_name + f"_recolored_{n}d.jpg", new_image[:, :, ::-1])
+    cv2.imwrite(savedir_image + image_name.replace(".jpg", f"_recolored_{n}d.jpg"), new_image[:, :, ::-1])
 
 
 def main():
